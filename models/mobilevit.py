@@ -265,10 +265,10 @@ class MobileViT(nn.Module):
         # Stage 5: Final MobileViT block with highest capacity
         # Most sophisticated global feature modeling
         self.stage5 = nn.Sequential(
-            InvertedResidualBlock(160, 640, stride=2, expand_ratio=4),
+            InvertedResidualBlock(160, 320, stride=2, expand_ratio=4),
             MobileViTBlock(
-                in_channels=640,
-                out_channels=640,
+                in_channels=320,
+                out_channels=320,
                 patch_size=2,
                 embed_dim=240,
                 num_heads=4,
@@ -285,7 +285,7 @@ class MobileViT(nn.Module):
         # This provides non-linear decision boundary for deepfake detection
         self.classifier = nn.Sequential(
             # First fully connected layer with dropout
-            nn.Linear(640, 256),
+            nn.Linear(320, 256),
             nn.BatchNorm1d(256),
             nn.SiLU(),
             nn.Dropout(0.2),
