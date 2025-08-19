@@ -402,16 +402,12 @@ class MobileViTBlock(nn.Module):
         # Transpose back to (batch_size, patch_dim, num_patches)
         reconstructed_patches = reconstructed_patches.transpose(1, 2)
 
-        # Calculate output spatial dimensions
-        output_height = height // self.patch_size
-        output_width = width // self.patch_size
-
-        # Fold patches back to spatial tensor
+        # Fold patches back to spatial tensor - output should be same size as input
         spatial_output = F.fold(
             reconstructed_patches,
-            output_size=(output_height, output_width),
-            kernel_size=1,
-            stride=1
+            output_size=(height, width),
+            kernel_size=self.patch_size,
+            stride=self.patch_size
         )
 
         # Step 7: Apply final convolution to adjust channels
