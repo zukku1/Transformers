@@ -207,15 +207,12 @@ class AdvancedAugmentations:
             Albumentations transform pipeline
         """
         return A.Compose([
-            # Resize to slightly larger size for random cropping
-            A.Resize(int(image_size * 1.2), int(image_size * 1.2)),
-
-            # Geometric augmentations
+            # Geometric augmentations - always ensure consistent output size
             A.RandomResizedCrop(
                 size=(image_size, image_size),
                 scale=(0.8, 1.0),
                 ratio=(0.9, 1.1),
-                p=0.8
+                p=1.0  # Always apply to ensure consistent size
             ),
 
             # Horizontal flip (common for face images)
