@@ -158,7 +158,11 @@ class DeepfakeDataset(Dataset):
 
         # Apply transformations if specified
         if self.transform:
-            image = self.transform(image)
+            # Convert PIL image to numpy array for albumentations
+            image_array = np.array(image)
+            # Apply albumentations transform with named argument
+            transformed = self.transform(image=image_array)
+            image = transformed['image']
 
         return image, label
 

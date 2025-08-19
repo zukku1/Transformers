@@ -647,8 +647,6 @@ class MobileViTTrainer:
         num_epochs = self.config.get('epochs', 100)
 
         print(f"Starting training for {num_epochs} epochs...")
-        print(f"Device: {self.device}")
-        print(f"Mixed precision: {self.use_amp}")
 
         for epoch in range(self.current_epoch, num_epochs):
             self.current_epoch = epoch
