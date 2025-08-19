@@ -155,7 +155,6 @@ class DeepfakeDataset(Dataset):
 
         # Load image
         image = self._load_image(image_path)
-
         # Apply transformations if specified
         if self.transform:
             # Convert PIL image to numpy array for albumentations
