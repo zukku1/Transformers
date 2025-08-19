@@ -246,7 +246,7 @@ class AdvancedAugmentations:
 
             # Noise and blur (common in deepfakes)
             A.OneOf([
-                A.GaussNoise(std_range=(10.0, 50.0), p=1.0),
+                A.GaussNoise(var_limit=(10.0, 50.0), p=1.0),
                 A.ISONoise(color_shift=(0.01, 0.05), p=1.0),
                 A.MultiplicativeNoise(multiplier=(0.9, 1.1), p=1.0),
             ], p=0.3),
@@ -408,7 +408,7 @@ class FaceAwareTransforms:
             ),
 
             # Minimal noise (deepfakes often have artifacts)
-            A.GaussNoise(std_range=(5.0, 25.0), p=0.2),
+            A.GaussNoise(var_limit=(5.0, 25.0), p=0.2),
 
             # Very light blur (compression artifacts)
             A.GaussianBlur(blur_limit=(1, 2), p=0.1),
