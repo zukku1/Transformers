@@ -688,11 +688,11 @@ def debug_model_gradients(model: nn.Module):
 
     # Gradient health check
     if total_norm > 100:
-        print("⚠️  WARNING: Large gradient norm detected! Consider gradient clipping.")
+        print("WARNING: Large gradient norm detected! Consider gradient clipping.")
     elif total_norm < 1e-6:
-        print("⚠️  WARNING: Very small gradient norm detected! Check for vanishing gradients.")
+        print("WARNING: Very small gradient norm detected! Check for vanishing gradients.")
     else:
-        print("✅ Gradient norm looks healthy.")
+        print("Gradient norm looks healthy.")
 
     print("=" * 60)
 
@@ -712,13 +712,13 @@ def check_model_device_consistency(model: nn.Module, input_tensor: torch.Tensor)
     print(f"Model devices: {model_devices}")
 
     if len(model_devices) > 1:
-        print("⚠️  WARNING: Model parameters are on different devices!")
+        print("WARNING: Model parameters are on different devices!")
         for name, param in model.named_parameters():
             print(f"  {name}: {param.device}")
     elif input_device not in model_devices:
-        print("⚠️  WARNING: Input and model are on different devices!")
+        print("WARNING: Input and model are on different devices!")
     else:
-        print("✅ Device consistency check passed.")
+        print("Device consistency check passed.")
 
 
 def profile_model_inference(model: nn.Module,
@@ -835,9 +835,9 @@ def save_model_for_deployment(model: nn.Module,
 
             # Check if outputs are close
             if torch.allclose(original_output, traced_output, atol=1e-5):
-                print("✅ Model tracing verification passed.")
+                print("Model tracing verification passed.")
             else:
-                print("⚠️  WARNING: Model tracing verification failed!")
+                print("WARNING: Model tracing verification failed!")
 
     except Exception as e:
         print(f"Error during model tracing: {e}")

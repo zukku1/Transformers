@@ -1,0 +1,42 @@
+{
+  "experiment_name": "mobilevit_deepfake_20250820_040825",
+  "best_validation_f1": 0.90312764158918,
+  "test_metrics": {
+    "accuracy": 0.7993112684140042,
+    "precision": 0.8401037165082109,
+    "recall": 0.7411361036980557,
+    "f1": 0.7875227871176828,
+    "precision_real": 0.7669069687607277,
+    "precision_fake": 0.8401037165082109,
+    "recall_real": 0.857910906298003,
+    "recall_fake": 0.7411361036980557,
+    "f1_real": 0.8098604313938735,
+    "f1_fake": 0.7875227871176828,
+    "sensitivity": 0.7411361036980557,
+    "specificity": 0.857910906298003,
+    "false_positive_rate": 0.14208909370199693,
+    "false_negative_rate": 0.25886389630194434,
+    "auc_roc": 0.8872308094588051
+  },
+  "config": {
+    "data_dir": "/root/.cache/kagglehub/datasets/shivamardeshna/real-and-fake-images-dataset-for-image-forensics/versions/1/Data Set 1/Data Set 1",
+    "batch_size": 32,
+    "image_size": 224,
+    "augmentation": "advanced",
+    "model_name": "mobilevit_s",
+    "num_classes": 2,
+    "pretrained": true,
+    "epochs": 50,
+    "learning_rate": 0.0001,
+    "weight_decay": 0.01,
+    "mixed_precision": true,
+    "gradient_clipping": 1.0,
+    "patience": 10,
+    "num_workers": 2,
+    "seed": 42,
+    "experiment_name": "mobilevit_deepfake_20250820_040825",
+    "log_dir": "/content/runs",
+    "checkpoint_dir": "/content/checkpoints",
+    "results_dir": "/content/results"
+  }
+}

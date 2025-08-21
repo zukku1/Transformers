@@ -1,0 +1,200 @@
+PROJECT FLOW EXPLANATION - MobileViT Deepfake Detection
+========================================================
+
+This document outlines the complete execution flow when running main.ipynb and how it interacts with various Python files.
+
+MAIN EXECUTION ENTRY POINT: main.ipynb
+=====================================
+
+When you execute main.ipynb, here's the complete flow:
+
+1. INITIAL SETUP (Cells 0-5)
+   ------------------------
+   - Cell 0: Clones repository from GitHub
+   - Cell 1: Updates repository with git pull
+   - Cell 2: Installs dependencies from requirements.txt
+   - Cell 3: Updates git submodules
+   - Cell 4: Downloads dataset using kagglehub
+   - Cell 5: Imports core libraries (torch, numpy, warnings handling)
+
+2. PROJECT MODULE IMPORTS (Cell 6)
+   --------------------------------
+   main.ipynb → IMPORTS FROM:
+   
+   a) models/mobilevit.py
+      - Function: mobilevit_s()
+      - Purpose: Creates MobileViT-S model architecture
+      - Dependencies: models/components.py (MobileViTBlock)
+   
+   b) data/dataset.py  
+      - Function: create_data_loaders()
+      - Purpose: Creates training, validation, test data loaders
+      - Handles: DeepfakeDataset class, data augmentation transforms
+   
+   c) training/trainer.py
+      - Class: MobileViTTrainer
+      - Function: plot_training_history()
+      - Purpose: Complete training pipeline with metrics, checkpointing
+   
+   d) utils/utils.py
+      - Functions: print_model_summary(), setup_device_and_memory(), setup_logging()
+      - Purpose: Utility functions for model analysis, device setup, logging
+
+3. CONFIGURATION SETUP (Cell 7)
+   -----------------------------
+   - Sets dataset paths and explores directory structure
+   - Creates configuration dictionary with training parameters
+   - Configures experiment settings (epochs, batch size, model params)
+
+4. ENVIRONMENT SETUP (Cell 8)
+   ---------------------------
+   main.ipynb → CALLS utils/utils.py:
+   - setup_directories(): Creates log, checkpoint, results directories
+   - set_random_seeds(): Sets reproducible random seeds
+   - setup_device_and_memory(): Configures optimal device (MPS/CUDA/CPU)
+
+5. MODEL CREATION (Cell 9)
+   ------------------------
+   main.ipynb → CALLS models/mobilevit.py:
+   
+   Flow: mobilevit_s() → MobileViT class → models/components.py
+   
+   Architecture Components Created:
+   - MobileViTBlock (combines CNN + Transformer)
+     ├── MultiHeadSelfAttention (global feature modeling)
+     ├── FeedForwardNetwork (MLP processing)
+     ├── TransformerBlock (attention + FFN with residuals)
+     └── Local convolutions for spatial features
+   
+   - Complete model stages:
+     ├── Stem: Initial feature extraction
+     ├── Stage 1-2: MobileNet blocks (local features)
+     ├── Stage 3-5: MobileViT blocks (global + local features)
+     └── Classifier: Final prediction layers
+
+6. DATA LOADING (Cell 10)
+   ----------------------
+   main.ipynb → CALLS data/dataset.py:
+   
+   Flow: create_data_loaders() → DeepfakeDataset class
+   
+   Data Pipeline:
+   - DeepfakeDataset loads images from real/fake directories
+   - Applies augmentation transforms (AdvancedAugmentations)
+   - Creates PyTorch DataLoaders for train/val/test
+   - Calculates class weights for balanced training
+
+7. TRAINER INITIALIZATION (Cell 11)
+   ---------------------------------
+   main.ipynb → CALLS training/trainer.py:
+   
+   MobileViTTrainer Setup:
+   - Initializes model, optimizers, schedulers
+   - Sets up mixed precision training (MPS/CUDA optimized)
+   - Configures loss function with class weights
+   - Sets up metrics calculator and early stopping
+   - Initializes TensorBoard logging
+
+8. TRAINING EXECUTION (Cell 12)
+   -----------------------------
+   main.ipynb → CALLS training/trainer.py:
+   
+   Training Loop Flow:
+   trainer.train() executes:
+   ├── For each epoch:
+   │   ├── train_epoch(): Forward/backward pass on training data
+   │   │   ├── Loads batches from train_loader
+   │   │   ├── Forward pass through MobileViT model
+   │   │   ├── Computes loss using CrossEntropyLoss
+   │   │   ├── Backward pass with gradient clipping
+   │   │   └── Updates model parameters
+   │   │
+   │   ├── validate_epoch(): Evaluation on validation data
+   │   │   ├── Forward pass without gradients
+   │   │   ├── Computes validation metrics
+   │   │   └── Updates MetricsCalculator
+   │   │
+   │   ├── Learning rate scheduling
+   │   ├── Model checkpointing (best model saving)
+   │   ├── Early stopping check
+   │   └── TensorBoard logging
+   └── Returns training history
+
+9. VISUALIZATION (Cell 13)
+   -----------------------
+   main.ipynb → CALLS training/trainer.py:
+   - plot_training_history(): Creates loss, accuracy, F1 plots
+   - Saves training visualization to results directory
+
+10. EVALUATION (Cell 14)
+    -------------------
+    main.ipynb → CALLS training/trainer.py:
+    
+    Test Evaluation Flow:
+    trainer.evaluate() executes:
+    ├── Loads test data
+    ├── Forward pass through trained model
+    ├── Computes comprehensive metrics:
+    │   ├── Accuracy, Precision, Recall, F1
+    │   ├── AUC-ROC, Sensitivity, Specificity
+    │   ├── Per-class metrics (real vs fake)
+    │   └── Confusion matrix
+    ├── Saves results to JSON files
+    └── Generates confusion matrix plot
+
+11. RESULTS PACKAGING (Cell 15)
+    ---------------------------
+    - Creates compressed zip file with all results
+    - Downloads results in Colab environment
+    - Final experiment summary with metrics
+
+DETAILED COMPONENT INTERACTIONS:
+===============================
+
+models/mobilevit.py:
+├── Defines MobileViT architecture class
+├── Uses components from models/components.py:
+│   ├── MobileViTBlock: Core innovation combining CNN+Transformer
+│   ├── MultiHeadSelfAttention: Global feature modeling
+│   ├── TransformerBlock: Attention + FFN with residuals
+│   └── FeedForwardNetwork: MLP processing
+└── Creates classification head for deepfake detection
+
+models/components.py:
+├── MultiHeadSelfAttention: Implements transformer attention mechanism
+├── FeedForwardNetwork: MLP with SiLU activation
+├── TransformerBlock: Combines attention + FFN with layer norm
+└── MobileViTBlock: Patches → Transformer → Spatial reconstruction
+
+data/dataset.py:
+├── DeepfakeDataset: Custom dataset for real/fake image classification
+├── AdvancedAugmentations: Sophisticated data augmentation pipeline
+├── create_data_loaders(): Creates train/val/test PyTorch DataLoaders
+└── Handles class balancing and preprocessing
+
+training/trainer.py:
+├── MobileViTTrainer: Complete training pipeline
+├── MetricsCalculator: Comprehensive evaluation metrics
+├── EarlyStopping: Prevents overfitting
+├── Mixed precision training for efficiency
+├── Model checkpointing and resuming
+└── TensorBoard integration for monitoring
+
+utils/utils.py:
+├── print_model_summary(): Detailed model analysis
+├── setup_device_and_memory(): Device optimization (MPS/CUDA/CPU)
+├── setup_logging(): Comprehensive logging setup
+├── Performance profiling and debugging utilities
+└── Model deployment utilities
+
+EXECUTION SUMMARY:
+=================
+main.ipynb orchestrates the entire deepfake detection pipeline by:
+1. Setting up environment and dependencies
+2. Creating MobileViT model architecture (CNN + Transformer hybrid)
+3. Loading and preprocessing deepfake dataset
+4. Training model with advanced optimization techniques
+5. Evaluating performance with comprehensive metrics
+6. Visualizing results and saving experiment artifacts
+
+The project demonstrates a complete machine learning pipeline from data loading to model deployment, specifically designed for deepfake detection using the innovative MobileViT architecture.
